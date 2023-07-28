@@ -30,8 +30,7 @@ const execWatch = (event, frompath, topath, readonly) => {
             return rimraf(topath, () => null);
         if (event === 'add' || event === 'change') {
             fs.copyFileSync(frompath, topath);
-            if (readonly)
-                fs.chmodSync(topath, 0o444);
+            fs.chmodSync(topath, readonly ? 0o444 : 0o666);
         }
     }, 100);
 };
