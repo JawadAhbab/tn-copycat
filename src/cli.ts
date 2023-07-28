@@ -32,7 +32,7 @@ async function run() {
       const relpath = relative(copyfrom, frompath)
       const topath = join(copyto, relpath)
       logger(idx, event, relpath)
-      execWatch(event, frompath, topath)
+      execWatch(event, frompath, topath, config.readonly)
     })
   })
 }

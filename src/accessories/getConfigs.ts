@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 import fs from 'fs-extra'
 import path from 'path'
-type CopycatConfigs = { copyfrom: string; copyto: string; excludes: string[] }[]
+type CopycatConfigs = { readonly: boolean; copyfrom: string; copyto: string; excludes: string[] }[]
 
 export const getConfigs = async () => {
   const configpath = path.join(process.cwd(), 'copycat.configs.json')

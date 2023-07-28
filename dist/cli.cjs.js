@@ -22,7 +22,7 @@ const dirtree = (folder, ignored = []) => {
         .sort((a, b) => a.length - b.length);
 };
 
-const execWatch = (event, frompath, topath) => {
+const execWatch = (event, frompath, topath, readonly) => {
     setTimeout(() => {
         if (event === 'addDir')
             return fs.ensureDirSync(topath);
@@ -30,7 +30,8 @@ const execWatch = (event, frompath, topath) => {
             return rimraf(topath, () => null);
         if (event === 'add' || event === 'change') {
             fs.copyFileSync(frompath, topath);
-            fs.chmodSync(topath, 0o444);
+            if (readonly)
+                fs.chmodSync(topath, 0o444);
         }
     }, 100);
 };
@@ -84,7 +85,7 @@ async function run() {
             const relpath = path.relative(copyfrom, frompath);
             const topath = path.join(copyto, relpath);
             logger(idx, event, relpath);
-            execWatch(event, frompath, topath);
+            execWatch(event, frompath, topath, config.readonly);
         });
     });
 }

@@ -1,4 +1,5 @@
 type CopycatConfigs = {
+    readonly: boolean;
     copyfrom: string;
     copyto: string;
     excludes: string[];

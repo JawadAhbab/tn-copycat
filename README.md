@@ -12,11 +12,13 @@
 ```json
 [
   {
+    "readonly": true,
     "copyfrom": "./src/testing/base/",
     "copyto": "./src/testing/copyone/",
     "excludes": ["./Components/fortwo"]
   },
   {
+    "readonly": true,
     "copyfrom": "./src/testing/base/",
     "copyto": "./src/testing/copytwo/",
     "excludes": ["./Components/forone"]
