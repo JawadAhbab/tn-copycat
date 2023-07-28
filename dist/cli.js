@@ -31,6 +31,7 @@ const execWatch = (event, frompath, topath, readonly) => {
         if (event === 'unlink' || event === 'unlinkDir')
             return rimraf(topath, () => null);
         if (event === 'add' || event === 'change') {
+            fs.chmodSync(topath, 0o666);
             fs.copyFileSync(frompath, topath);
             fs.chmodSync(topath, readonly ? 0o444 : 0o666);
         }
