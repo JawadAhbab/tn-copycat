@@ -28,8 +28,10 @@ const execWatch = (event, frompath, topath) => {
             return fs.ensureDirSync(topath);
         if (event === 'unlink' || event === 'unlinkDir')
             return rimraf(topath, () => null);
-        if (event === 'add' || event === 'change')
-            return fs.copyFileSync(frompath, topath, 444);
+        if (event === 'add' || event === 'change') {
+            fs.copyFileSync(frompath, topath);
+            fs.chmodSync(topath, 444);
+        }
     }, 100);
 };
 
