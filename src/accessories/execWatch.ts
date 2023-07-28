@@ -8,7 +8,7 @@ export const execWatch = (event: Event, frompath: string, topath: string) => {
     if (event === 'unlink' || event === 'unlinkDir') return rimraf(topath, () => null)
     if (event === 'add' || event === 'change') {
       copyFileSync(frompath, topath)
-      chmodSync(topath, 444)
+      chmodSync(topath, 0o444)
     }
   }, 100)
 }
