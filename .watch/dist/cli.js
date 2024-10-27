@@ -2,11 +2,31 @@
 
 'use strict';
 
+var chokidar = require('chokidar');
 var fs = require('fs-extra');
 var path = require('path');
+var rimraf = require('rimraf');
 var chalk = require('chalk');
 var tnCapitalize = require('tn-capitalize');
-var rimraf = require('rimraf');
+
+const execWatch = (event, frompath, topath, readonly) => {
+    setTimeout(() => {
+        if (event === 'addDir')
+            return;
+        if (event === 'unlink' || event === 'unlinkDir')
+            return rimraf(topath, () => null);
+        if (event === 'add' || event === 'change') {
+            try {
+                if (fs.existsSync(topath))
+                    fs.chmodSync(topath, 0o666);
+                fs.ensureDirSync(path.dirname(topath));
+                fs.copyFileSync(frompath, topath);
+                fs.chmodSync(topath, readonly ? 0o444 : 0o666);
+            }
+            catch { }
+        }
+    }, 100);
+};
 
 const isExcluded = (path, { excludes, includes }) => {
     const exc = excludes.some((i) => path.startsWith(i));
@@ -110,11 +130,13 @@ async function run() {
         }
         const blanks = getBlankFolders(copyto);
         blanks.forEach((blank) => rimrafAsync(blank));
-        // watch(copyfrom).on('all', (event, frompath) => {
-        //   const relpath = relative(copyfrom, frompath)
-        //   const topath = join(copyto, relpath)
-        //   logger(idx, event, relpath)
-        //   execWatch(event, frompath, topath, config.readonly)
-        // })
+        chokidar.watch(copyfrom).on('all', (event, frompath) => {
+            const relpath = path.relative(copyfrom, frompath);
+            const topath = path.join(copyto, relpath);
+            if (isExcluded(frompath, { excludes, includes }))
+                return;
+            logger(idx, event, relpath);
+            execWatch(event, frompath, topath, config.readonly);
+        });
     });
 }

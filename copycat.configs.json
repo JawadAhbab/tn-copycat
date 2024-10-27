@@ -1,10 +1,13 @@
 [
   {
+    "readonly": true,
     "copyfrom": "./src/testing/base/",
     "copyto": "./src/testing/copyone/",
     "excludes": [
-      "./pocha"
+      "./"
     ],
-    "includes": []
+    "includes": [
+      "./foo/"
+    ]
   }
 ]

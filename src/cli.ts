@@ -1,8 +1,11 @@
+import { watch } from 'chokidar'
 import fs from 'fs-extra'
 import { join, relative } from 'path'
+import { execWatch } from './accessories/execWatch'
 import { filetree } from './accessories/filetree'
 import { getBlankFolders } from './accessories/getBlankFolders'
 import { getConfigs } from './accessories/getConfigs'
+import { isExcluded } from './accessories/isExcluded'
 import { logger } from './accessories/logger'
 import { rimrafAsync } from './accessories/rimrafAsync'
 
@@ -31,11 +34,12 @@ async function run() {
     const blanks = getBlankFolders(copyto)
     blanks.forEach((blank) => rimrafAsync(blank))
 
-    // watch(copyfrom).on('all', (event, frompath) => {
-    //   const relpath = relative(copyfrom, frompath)
-    //   const topath = join(copyto, relpath)
-    //   logger(idx, event, relpath)
-    //   execWatch(event, frompath, topath, config.readonly)
-    // })
+    watch(copyfrom).on('all', (event, frompath) => {
+      const relpath = relative(copyfrom, frompath)
+      const topath = join(copyto, relpath)
+      if (isExcluded(frompath, { excludes, includes })) return
+      logger(idx, event, relpath)
+      execWatch(event, frompath, topath, config.readonly)
+    })
   })
 }
