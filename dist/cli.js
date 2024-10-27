@@ -3,21 +3,21 @@
 'use strict';
 
 var chokidar = require('chokidar');
+var fs = require('fs-extra');
 var path = require('path');
 var rimraf = require('rimraf');
-var fs = require('fs-extra');
 var chalk = require('chalk');
 var tnCapitalize = require('tn-capitalize');
 
-const dirtree = (folder, ignored = []) => {
+const dirtree = (folder, excludes = [], includes = []) => {
     return fs.readdirSync(folder, { withFileTypes: true })
         .map((ff) => {
         const fullpath = path.join(folder, ff.name);
-        if (ignored.includes(fullpath))
+        if (excludes.includes(fullpath))
             return;
         if (ff.isFile())
             return fullpath;
-        return [fullpath, ...dirtree(fullpath, ignored)];
+        return [fullpath, ...dirtree(fullpath, excludes, includes)];
     })
         .flat()
         .filter((i) => i)
@@ -75,16 +75,17 @@ async function run() {
     configs.forEach((config, idx) => {
         const copyfrom = path.join(process.cwd(), config.copyfrom);
         const copyto = path.join(process.cwd(), config.copyto);
-        const ignored = config.excludes.map((p) => path.join(copyfrom, p));
+        const excludes = config.excludes?.map((p) => path.join(copyfrom, p)) || [];
+        const includes = config.includes?.map((p) => path.join(copyfrom, p)) || [];
         fs.ensureDirSync(copyto);
         const has = dirtree(copyto).map((p) => path.relative(copyto, p));
-        const mayhave = dirtree(copyfrom, ignored).map((p) => path.relative(copyfrom, p));
+        const mayhave = dirtree(copyfrom, excludes, includes).map((p) => path.relative(copyfrom, p));
         const orphaned = has.filter((p) => !mayhave.includes(p));
         orphaned.forEach((path$1) => {
             logger(idx, 'unlink', path$1);
             rimraf(path.join(copyto, path$1), () => null);
         });
-        chokidar.watch(copyfrom, { ignored }).on('all', (event, frompath) => {
+        chokidar.watch(copyfrom).on('all', (event, frompath) => {
             const relpath = path.relative(copyfrom, frompath);
             const topath = path.join(copyto, relpath);
             logger(idx, event, relpath);
