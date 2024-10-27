@@ -33,7 +33,9 @@ const execWatch = (event, frompath, topath, readonly) => {
         if (event === 'add' || event === 'change') {
             if (fs.existsSync(topath))
                 fs.chmodSync(topath, 0o666);
+            console.log('ONE');
             fs.copyFileSync(frompath, topath);
+            console.log('Two');
             fs.chmodSync(topath, readonly ? 0o444 : 0o666);
         }
     }, 100);
