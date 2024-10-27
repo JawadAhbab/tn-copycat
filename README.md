@@ -15,13 +15,15 @@
     "readonly": true,
     "copyfrom": "./src/testing/base/",
     "copyto": "./src/testing/copyone/",
-    "excludes": ["./Components/fortwo"]
+    "excludes": ["./Components/fortwo"],
+    "includes": []
   },
   {
     "readonly": true,
     "copyfrom": "./src/testing/base/",
     "copyto": "./src/testing/copytwo/",
-    "excludes": ["./Components/forone"]
+    "excludes": ["./Components/forone"],
+    "includes": []
   }
 ]
 ```
