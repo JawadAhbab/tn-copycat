@@ -4,6 +4,7 @@
     "copyto": "./src/testing/copyone/",
     "excludes": [
       "./pocha"
-    ]
+    ],
+    "includes": []
   }
 ]

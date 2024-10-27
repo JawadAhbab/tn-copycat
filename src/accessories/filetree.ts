@@ -3,13 +3,13 @@ import { join } from 'path'
 import { isExcluded } from './isExcluded'
 type F = string[]
 
-export const dirtree = (folder: string, excludes: F = [], includes: F = []): F => {
+export const filetree = (folder: string, excludes: F = [], includes: F = []): F => {
   return readdirSync(folder, { withFileTypes: true })
     .map((ff) => {
       const fullpath = join(folder, ff.name)
-      if (isExcluded(fullpath, { excludes, includes })) return
-      if (ff.isFile()) return fullpath
-      return [fullpath, ...dirtree(fullpath, excludes, includes)]
+      const path = isExcluded(fullpath, { excludes, includes }) ? null : fullpath
+      if (ff.isFile()) return path
+      return filetree(fullpath, excludes, includes)
     })
     .flat()
     .filter((i) => i)
