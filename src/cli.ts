@@ -6,6 +6,7 @@ import { dirtree } from './accessories/dirtree'
 import { execWatch } from './accessories/execWatch'
 import { getConfigs } from './accessories/getConfigs'
 import { logger } from './accessories/logger'
+import { isExcluded } from './accessories/isExcluded'
 
 console.clear()
 run()
@@ -31,6 +32,8 @@ async function run() {
 
     watch(copyfrom).on('all', (event, frompath) => {
       const relpath = relative(copyfrom, frompath)
+      console.log(relpath)
+      if (isExcluded(relpath, { excludes, includes })) return
       const topath = join(copyto, relpath)
       logger(idx, event, relpath)
       execWatch(event, frompath, topath, config.readonly)

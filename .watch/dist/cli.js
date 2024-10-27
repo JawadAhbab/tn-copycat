@@ -9,11 +9,17 @@ var rimraf = require('rimraf');
 var chalk = require('chalk');
 var tnCapitalize = require('tn-capitalize');
 
+const isExcluded = (path, { excludes, includes }) => {
+    const exc = excludes.includes(path);
+    const inc = includes.includes(path);
+    return exc && !inc;
+};
+
 const dirtree = (folder, excludes = [], includes = []) => {
     return fs.readdirSync(folder, { withFileTypes: true })
         .map((ff) => {
         const fullpath = path.join(folder, ff.name);
-        if (excludes.includes(fullpath))
+        if (isExcluded(fullpath, { excludes, includes }))
             return;
         if (ff.isFile())
             return fullpath;
@@ -90,6 +96,9 @@ async function run() {
         });
         chokidar.watch(copyfrom).on('all', (event, frompath) => {
             const relpath = path.relative(copyfrom, frompath);
+            console.log(relpath);
+            if (isExcluded(relpath, { excludes, includes }))
+                return;
             const topath = path.join(copyto, relpath);
             logger(idx, event, relpath);
             execWatch(event, frompath, topath, config.readonly);
